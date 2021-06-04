@@ -3,7 +3,11 @@ from FarMeKart import views
 from django.contrib.auth import views as ad
 
 urlpatterns = [
-    path('',views.home,name="hm"),
+    path('',views.items,name="hm"),
+     path('item/',views.item,name="item"),
+      
+  
+
     path('lg/',ad.LoginView.as_view(template_name="html/login.html"),name="lgo"),
     path('reg/',views.registration,name="rg"),
     path('lgo/',ad.LogoutView.as_view(template_name='html/logout.html'),name="logo"),

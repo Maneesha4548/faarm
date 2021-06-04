@@ -7,7 +7,6 @@ from datetime import date
 from django.contrib.auth.models import AbstractUser,User
 
 
-
 class User(AbstractUser):
 	t = (
 		(1,'Farmer'),
@@ -63,7 +62,9 @@ class Vegpro(models.Model):
 	v = [('vegetables',"Vegetables"),('Fruits','Fruits')]
 	item_type=models.CharField(max_length=10,choices=v)
 	item_name=models.CharField(max_length=20)
-	quantity=models.IntegerField(default="")
+	fname=models.CharField(max_length=20)
+	quantity=models.IntegerField(default="0")
+	totalquantity=models.IntegerField(default=10)
 	is_farmer = models.IntegerField(default=0)
 	is_stock = models.IntegerField(default=0)
 	market_price=models.DecimalField(max_digits=6,decimal_places=2,default=0)
@@ -71,12 +72,14 @@ class Vegpro(models.Model):
 	impf=models.ImageField(upload_to='images/')
 	create_date=models.DateField(auto_now_add=True)
 	a=models.ForeignKey(User,on_delete=models.CASCADE)
+	
 
 class UserPro(models.Model):
 	farmers_name=models.CharField(max_length=10)
 	item_type=models.CharField(max_length=10)
 	item_name=models.CharField(max_length=20)
-	quantity=models.IntegerField(default="")
+	totalquantity=models.IntegerField(default=10)
+	quantity=models.IntegerField(default=0)
 	price=models.DecimalField(max_digits=6,decimal_places=2)
 	is_status=models.IntegerField(default=0)
 	e=models.ForeignKey(Vegpro,on_delete=models.CASCADE)
@@ -84,6 +87,7 @@ class UserPro(models.Model):
 class Cart(models.Model):
 	user=models.ForeignKey(User,on_delete=models.CASCADE)
 	veg=models.ForeignKey(Vegpro,on_delete=models.CASCADE)
+
 
 class Myorders(models.Model):
 	# a=[("product quality issues","product quality issues"),("I want to change address/phone number","I want to change address/phone number"),("I have purchased product somewhere else","I have purchased product somewhere else"),("others","others")]

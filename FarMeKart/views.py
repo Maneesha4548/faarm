@@ -10,10 +10,6 @@ import sys
 import secrets
 from django.http import HttpResponse
 
-# Create your views here.
-
-
-
 
 
 
@@ -23,18 +19,7 @@ def remove(request,id):
 	return redirect('/cartdetails')
 
 	
-def home(re):
-	i = Vegpro.objects.filter(a_id=re.user.id)
-	s = Vegpro.objects.all()
-	k = {}
-	for m in s:
-		g = User.objects.get(id=m.a_id)
-		k[m.id] = m.item_type,m.item_name,m.quantity,m.price,m.impf,m.is_stock,m.create_date,g.username
-	f = k.values()
-	return render(re,'html/cart1.html',{'it':i,'d':f})
-	
-# def home(re):
-# 	return render(re,"html/home.html")
+
 def contact(re):
 	return render(re,"html/contact.html")
 
@@ -108,7 +93,6 @@ def vegf(request):
 
 
 
-
 @login_required
 def infodelete(req,et):
 	data=Vegpro.objects.get(id=et)
@@ -133,7 +117,7 @@ def itemupdate(request,y):
 
 
 
-@login_required
+
 def items(request):
 	i = Vegpro.objects.filter(a_id=request.user.id)
 	data=Vegpro.objects.all()
@@ -143,13 +127,13 @@ def items(request):
 	k = {}
 	for m in s:
 		g = User.objects.get(id=m.a_id)
-		k[m.id] = m.item_type,m.item_name,m.quantity,m.price,m.impf,m.market_price,m.is_stock,m.create_date,g.username
+		k[m.id] = m.item_type,m.item_name,m.quantity,m.fname,m.price,m.impf,m.market_price,m.is_stock,m.create_date,g.username
 	f = k.values()
 	return render(request,'html/cart.html',{'data':data,'d':f})
 
 def addcart(request,id):
 	r=Vegpro.objects.get(id=id)
-	if request.method == 'POST':
+	if request.method == 'POST': 
 		p=Cart(user_id=request.user.id,veg_id=id)
 		p.save()
 		
@@ -178,6 +162,8 @@ def requestform(request):
 		else:
 			return redirect('/lg')
 	return render(request,'html/requestp.html')
+
+
 
 def adminpermissions(request):
 	ty=User.objects.all()
@@ -219,8 +205,6 @@ def userdelete(request,id):
 
 def addcart(request,id):
 	b=Vegpro.objects.get(id=id)
-	print("hi")
-	print(b)
 
 	c=Cart(user_id=request.user.id,veg_id=id)
 	c.save()
@@ -232,12 +216,14 @@ def addcart(request,id):
 
 def cartdetails(request):
 	c=Cart.objects.filter(user_id=request.user.id)
+	s=100
 	sum=0
 	count=0
 	for i in c:
 		count=count+1
 		sum=sum+i.veg.price
-	return render(request,'html/cartdetails.html',{'sum':sum,'count':count,'cart':c})
+	sum=sum+s
+	return render(request,'html/cartdetails.html',{'sum':sum,'count':count,'cart':c,'s':s})
 
 def placeorder(request):
 	c=Cart.objects.filter(user_id=request.user.id)
@@ -247,6 +233,21 @@ def placeorder(request):
 		count=count+1
 		sum=sum+i.veg.price
 	return render(request,'html/placeorder.html',{'sum':sum,'count':count,'cart':c})
+@login_required
+def item(request):
+	t = Vegpro.objects.filter(a_id=request.user.id)
+	if request.method == "POST":
+		s = Vegfr(request.POST,request.FILES)
+		if s.is_valid():
+			r = s.save(commit=False)
+			r.a_id = request.user.id
+			r.save()
+			return redirect('/')
+	s=Vegfr()
+	return render(request,'html/item.html',{'a':s,'e':t})
+
+
+
 
 def msg(request):
 	c=Cart.objects.filter(user_id=request.user.id)
@@ -310,6 +311,7 @@ def checkout(request):
 				a.save()
 				he=Vegpro.objects.filter(id=i.veg_id)
 				for i in he:
+					i.totalquantity-=1
 					i.save()
 			c.delete()
 			return redirect('msg')
